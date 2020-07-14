@@ -24,6 +24,11 @@
         width: 100vw;
         margin: 0;
       }
+
+      #player {
+        max-width: 96vw;
+        margin-left: 2vw;
+      }
     </style>
   </head>
   <body>
@@ -31,9 +36,9 @@
     <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
     <script>
       (async () => {
-        const data = await fetch("https://static.suisei.moe/music/meta.json").then((x) =>
-          x.json()
-        );
+        const data = await fetch(
+          "https://static.suisei.moe/music/meta.json"
+        ).then((x) => x.json());
         const ap = new APlayer({
           container: document.getElementById("player"),
           audio: data.map((x) => {
