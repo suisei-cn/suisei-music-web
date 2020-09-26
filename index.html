@@ -23,6 +23,7 @@
         footer {
             margin-top: 6px;
             margin-bottom: 6px;
+            text-align: center;
         }
 
         a {
@@ -58,7 +59,7 @@
 
         #player .aplayer-list,
         #player .aplayer-list ol {
-            max-height: 90vh !important;
+            max-height: 68vh !important;
         }
     </style>
 </head>
@@ -98,6 +99,7 @@
             let ap = new APlayer({
                 container: document.getElementById("player"),
                 audio: [...stdList],
+                listFolded: false,
             });
             console.log(ap)
             const domSearch = document.querySelector('#searchItem')
