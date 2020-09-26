@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Suisei Music Player</title>
+    <title>SuiPlayer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" />
     <link rel="alternate" type="application/rss+xml" title="Suisei Music Podcast"
         href="https://suisei.moe/podcast.xml" />
@@ -89,8 +89,7 @@
             const stdList = data.map((x) => {
                 return {
                     name:
-                        `${x.title} (${x.datetime.slice(0, 10)})` +
-                        (x.artist === "星街すいせい" ? "" : ` (Orig. ${x.artist})`),
+                        getNameFromMeta(x),
                     artist: x.performer,
                     url: x.url,
                     cover: "https://static.suisei.moe/image/98f560ae05c02361.jpeg",
@@ -101,7 +100,6 @@
                 audio: [...stdList],
                 listFolded: false,
             });
-            console.log(ap)
             const domSearch = document.querySelector('#searchItem')
             const q = new URL(document.location).searchParams.get("q")
             if (q !== null) {
@@ -109,7 +107,18 @@
                 applySearchResults(q.toLowerCase(), stdList, ap)
             }
             setupSearch(domSearch, stdList, ap)
+            ap.on('play', x => {
+                document.title = "▶️ " + findAudioDescByUrl(ap.audio.src, data) + " | SuiPlayer"
+            })
+            ap.on('pause', x => {
+                document.title = "SuiPlayer"
+            })
         })();
+
+        function getNameFromMeta(x) {
+            return `${x.title} (${x.datetime.slice(0, 10)})` +
+                (x.artist === "星街すいせい" ? "" : ` (Orig. ${x.artist})`)
+        }
 
         function audioHas(audioObj, word) {
             return audioObj.name.toLowerCase().includes(word) || audioObj.artist.toLowerCase().includes(word)
@@ -117,6 +126,14 @@
 
         function audioEqu(au1, au2) {
             return au1.url === au2.url
+        }
+
+        function findAudioDescByUrl(url, std) {
+            const audio = std.filter(x => x.url === url)
+            if (audio.length === 0) {
+                return `Unknown track`
+            }
+            return getNameFromMeta(audio[0]) + ` by ${audio[0].performer}`
         }
 
         function applySearchResults(val, std, ap) {
