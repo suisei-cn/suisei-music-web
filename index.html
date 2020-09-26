@@ -2,83 +2,154 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suisei Music Player</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" />
-  <link rel="alternate" type="application/rss+xml" title="Suisei Music Podcast" href="https://suisei.moe/podcast.xml" />
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      width: 100vw;
-      margin: 0;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suisei Music Player</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" />
+    <link rel="alternate" type="application/rss+xml" title="Suisei Music Podcast"
+        href="https://suisei.moe/podcast.xml" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+        }
 
-    .notice {
-      margin-top: 6px;
-      margin-bottom: 4px;
-    }
+        .notice,
+        footer {
+            margin-top: 6px;
+            margin-bottom: 6px;
+        }
 
-    @media screen and (max-width: 900px) {
-      .notice {
-        display: none;
-      }
-    }
+        a {
+            text-decoration: none;
+            color: #1686b6;
+        }
 
-    #player {
-      width: min(700px, 96vw);
-      margin-left: 2vw;
-    }
+        a:hover,
+        a:focus {
+            text-decoration: underline;
+        }
 
-    .loading {
-      text-align: center;
-      color: grey;
-    }
+        @media screen and (max-width: 900px) {
+            .notice {
+                display: none;
+            }
+        }
 
-    #player .aplayer-list,
-    #player .aplayer-list ol {
-      max-height: 90vh !important;
-    }
-  </style>
+        #player {
+            width: min(700px, 96vw);
+            margin-left: 2vw;
+        }
+
+        #searchItem {
+            width: min(600px, 85vw);
+            margin-left: 2vw;
+        }
+
+        .loading {
+            text-align: center;
+            color: grey;
+        }
+
+        #player .aplayer-list,
+        #player .aplayer-list ol {
+            max-height: 90vh !important;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="notice">
-    Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered experience on PC!
-    (<a href="#" onclick="hideNotice()">hide</a>)
-  </div>
-  <div id="player">
-    <div class="loading">Player is loading..</div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
-  <script>
-    (async () => {
-      const data = await fetch(
-        "https://static.suisei.moe/music/meta.json"
-      ).then((x) => x.json());
-      const ap = new APlayer({
-        container: document.getElementById("player"),
-        audio: data.map((x) => {
-          return {
-            name:
-              `${x.title} (${x.datetime.slice(0, 10)})` +
-              (x.artist === "星街すいせい" ? "" : ` (Orig. ${x.artist})`),
-            artist: x.performer,
-            url: x.url,
-            cover: "https://static.suisei.moe/image/98f560ae05c02361.jpeg",
-          };
-        }),
-      });
-    })();
+    <div class="notice">
+        Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered experience on PC!
+        (<a href="#" onclick="hideNotice()">hide</a>)
+    </div>
+    <div>
+        <input type="text" id="searchItem" class="playArea" placeholder="Search...">
+    </div>
+    <div id="player" class="playArea">
+        <div class="loading">Player is loading..</div>
+    </div>
+    <footer>
+        <a href="https://github.com/suisei-cn/suisei-music-web" target="_blank">suisei-music-web</a>, powered by <a
+            href="https://github.com/suisei-cn/" target="_blank">suisei-cn</a> community
+        with love
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+    <script>
+        (async () => {
+            const data = await fetch(
+                "https://static.suisei.moe/music/meta.json"
+            ).then((x) => x.json());
+            const stdList = data.map((x) => {
+                return {
+                    name:
+                        `${x.title} (${x.datetime.slice(0, 10)})` +
+                        (x.artist === "星街すいせい" ? "" : ` (Orig. ${x.artist})`),
+                    artist: x.performer,
+                    url: x.url,
+                    cover: "https://static.suisei.moe/image/98f560ae05c02361.jpeg",
+                };
+            })
+            let ap = new APlayer({
+                container: document.getElementById("player"),
+                audio: [...stdList],
+            });
+            console.log(ap)
+            const domSearch = document.querySelector('#searchItem')
+            const q = new URL(document.location).searchParams.get("q")
+            if (q !== null) {
+                domSearch.value = q
+                applySearchResults(q.toLowerCase(), stdList, ap)
+            }
+            setupSearch(domSearch, stdList, ap)
+        })();
 
-    function hideNotice() {
-      document.querySelector('.notice').style.display = 'none'
-    }
-  </script>
+        function audioHas(audioObj, word) {
+            return audioObj.name.toLowerCase().includes(word) || audioObj.artist.toLowerCase().includes(word)
+        }
+
+        function audioEqu(au1, au2) {
+            return au1.url === au2.url
+        }
+
+        function applySearchResults(val, std, ap) {
+            const finalList = std.filter(x => audioHas(x, val))
+            const currentList = ap.list.audios
+            for (let i = currentList.length - 1; i >= 0; i--) {
+                if (!audioHas(ap.list.audios[i], val)) {
+                    ap.list.remove(i)
+                }
+            }
+            const addQueue = []
+            for (const i of finalList) {
+                let bad = false
+                for (const j of currentList) {
+                    if (audioEqu(j, i)) {
+                        bad = true
+                        break
+                    }
+                }
+                if (!bad) addQueue.push(i)
+            }
+            ap.list.add(addQueue)
+        }
+
+        function setupSearch(search, std, ap) {
+            search.addEventListener('input', x => {
+                const val = search.value.toLowerCase()
+                applySearchResults(val, std, ap)
+            })
+        }
+
+        function hideNotice() {
+            document.querySelector('.notice').style.display = 'none'
+        }
+    </script>
 </body>
 
 </html>
