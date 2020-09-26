@@ -108,7 +108,7 @@
             }
             setupSearch(domSearch, stdList, ap)
             ap.on('play', x => {
-                document.title = "▶️ " + findAudioDescByUrl(ap.audio.src, data) + " | SuiPlayer"
+                document.title = findAudioDescByUrl(ap.audio.src, data) + " | SuiPlayer"
             })
             ap.on('pause', x => {
                 document.title = "SuiPlayer"
