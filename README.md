@@ -1,6 +1,6 @@
 # suisei-music-web
 
-**<https://suisei-cn.github.io/suisei-music-web/>**
+**<https://player.suisei.moe>**
 
 [suisei-music](https://github.com/suisei-cn/suisei-music) on the web.
 
