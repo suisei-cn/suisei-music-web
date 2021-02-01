@@ -107,12 +107,15 @@
                 applySearchResults(q.toLowerCase(), stdList, ap)
             }
             setupSearch(domSearch, stdList, ap)
-            ap.on('play', x => {
+            ap.on('play', () => {
                 document.title = findAudioDescByUrl(ap.audio.src, data) + " | SuiPlayer"
             })
-            ap.on('pause', x => {
+            ap.on('pause', () => {
                 document.title = "SuiPlayer"
             })
+            if ('mediaSession' in navigator) {
+                setupMediaSessionAPI(ap, data)
+            }
         })();
 
         function getNameFromMeta(x) {
@@ -128,12 +131,20 @@
             return au1.url === au2.url
         }
 
-        function findAudioDescByUrl(url, std) {
+        function findAudioInfo(url, std) {
             const audio = std.filter(x => x.url === url)
             if (audio.length === 0) {
+                return null
+            }
+            return audio[0]
+        }
+
+        function findAudioDescByUrl(url, std) {
+            const audio = findAudioInfo(url, std)
+            if (audio === null) {
                 return `Unknown track`
             }
-            return getNameFromMeta(audio[0]) + ` by ${audio[0].performer}`
+            return getNameFromMeta(audio) + ` by ${audio.performer}`
         }
 
         function applySearchResults(val, std, ap) {
@@ -167,6 +178,49 @@
 
         function hideNotice() {
             document.querySelector('.notice').style.display = 'none'
+        }
+
+        function setupMediaSessionAPI(ap, data) {
+            ap.on('play', () => {
+                const audio = findAudioInfo(ap.audio.src, data)
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: getNameFromMeta(audio),
+                    artist: audio.performer,
+                    album: 'Suisei Music Player',
+                    artwork: [
+                        { src: 'https://player.suisei.moe/cover-512.png', sizes: '512x512', type: 'image/png' },
+                        { src: 'https://player.suisei.moe/cover.png' },
+
+                    ]
+                });
+            })
+            navigator.mediaSession.setActionHandler('play', function () {
+                ap.play()
+            });
+            navigator.mediaSession.setActionHandler('pause', function () {
+                ap.pause()
+            });
+            navigator.mediaSession.setActionHandler('stop', function () {
+                ap.pause()
+                ap.seek(0)
+            });
+            navigator.mediaSession.setActionHandler('seekbackward', function (details) {
+                const seekTime = isNaN(details.seekOffset) ? details.seekOffset : 5;
+                ap.seek(
+                    Math.max(ap.audio.currentTime - seekTime, 0)
+                )
+            });
+            navigator.mediaSession.setActionHandler('seekforward', function (details) {
+                const seekTime = isNaN(details.seekOffset) ? details.seekOffset : 5;
+                ap.seek(
+                    Math.min(ap.audio.currentTime + seekTime, ap.audio.duration)
+                )
+            });
+            navigator.mediaSession.setActionHandler('seekto', function (details) {
+                ap.seek(details.seekTime)
+            });
+            navigator.mediaSession.setActionHandler('previoustrack', function () { ap.skipBack() });
+            navigator.mediaSession.setActionHandler('nexttrack', function () { ap.skipForward() });
         }
     </script>
 </body>
