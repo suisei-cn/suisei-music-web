@@ -205,13 +205,13 @@
                 ap.seek(0)
             });
             navigator.mediaSession.setActionHandler('seekbackward', function (details) {
-                const seekTime = isNaN(details.seekOffset) ? details.seekOffset : 5;
+                const seekTime = isNaN(details.seekOffset) ? Number(details.seekOffset) : 5;
                 ap.seek(
                     Math.max(ap.audio.currentTime - seekTime, 0)
                 )
             });
             navigator.mediaSession.setActionHandler('seekforward', function (details) {
-                const seekTime = isNaN(details.seekOffset) ? details.seekOffset : 5;
+                const seekTime = isNaN(details.seekOffset) ? Number(details.seekOffset) : 5;
                 ap.seek(
                     Math.min(ap.audio.currentTime + seekTime, ap.audio.duration)
                 )
