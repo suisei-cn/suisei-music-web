@@ -169,10 +169,24 @@
             ap.list.add(addQueue)
         }
 
+        function throttle(fun, time) {
+            let timeout = undefined
+
+            return (...args) => {
+                if (timeout) clearTimeout(timeout)
+                timeout = setTimeout(() => {
+                    fun(...args)
+                    timeout = undefined
+                }, time)
+            }
+        }
+
+        const throttledSearch = throttle(applySearchResults, 600)
+
         function setupSearch(search, std, ap) {
             search.addEventListener('input', x => {
                 const val = search.value.toLowerCase()
-                applySearchResults(val, std, ap)
+                throttledSearch(val, std, ap)
             })
         }
 
