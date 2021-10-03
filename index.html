@@ -160,6 +160,9 @@
         }
 
         function applySearchResults(val, std, ap) {
+            if (String.prototype.normalize) {
+                val = val.normalize("NFC")
+            }
             const finalList = std.filter((x) => audioHas(x, val))
             const currentList = ap.list.audios
             for (let i = currentList.length - 1; i >= 0; i--) {
