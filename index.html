@@ -66,65 +66,70 @@
 
 <body>
     <div class="notice">
-        Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered experience on PC!
-        (<a href="#" onclick="hideNotice()">hide</a>)
+        Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered
+        experience on PC! (<a href="#" onclick="hideNotice()">hide</a>)
     </div>
     <div id="searchArea">
-        <input type="text" id="searchItem" class="playArea" placeholder="Search...">
+        <input type="text" id="searchItem" class="playArea" placeholder="Search..." />
     </div>
     <div id="player" class="playArea">
         <div class="loading">Player is loading..</div>
     </div>
     <footer>
-        <a href="https://github.com/suisei-cn/suisei-music-web" target="_blank">suisei-music-web</a>, powered by <a
-            href="https://github.com/suisei-cn/" target="_blank">suisei-cn</a> community
-        with love
+        <a href="https://github.com/suisei-cn/suisei-music-web" target="_blank">suisei-music-web</a>, powered by
+        <a href="https://github.com/suisei-cn/" target="_blank">suisei-cn</a>
+        community with love
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
     <script>
-        (async () => {
+        ; (async () => {
             const data = await fetch(
-                "https://suisei-podcast.outv.im/meta.json"
-            ).then((x) => x.json());
+                'https://suisei-podcast.outv.im/meta.json'
+            ).then((x) => x.json())
             const stdList = data.map((x) => {
                 return {
-                    name:
-                        getNameFromMeta(x),
+                    name: getNameFromMeta(x),
                     artist: x.performer,
                     url: x.url,
-                    cover: "https://static.suisei.moe/image/98f560ae05c02361.jpeg",
-                };
+                    cover: 'https://static.suisei.moe/image/98f560ae05c02361.jpeg',
+                }
             })
             let ap = new APlayer({
-                container: document.getElementById("player"),
+                container: document.getElementById('player'),
                 audio: [...stdList],
                 listFolded: false,
-            });
+            })
             const domSearch = document.querySelector('#searchItem')
-            const q = new URL(document.location).searchParams.get("q")
+            const q = new URL(document.location).searchParams.get('q')
             if (q !== null) {
                 domSearch.value = q
                 applySearchResults(q.toLowerCase(), stdList, ap)
             }
             setupSearch(domSearch, stdList, ap)
             ap.on('play', () => {
-                document.title = findAudioDescByUrl(ap.audio.src, data) + " | SuiPlayer"
+                document.title =
+                    findAudioDescByUrl(ap.audio.src, data) + ' | SuiPlayer'
             })
             ap.on('pause', () => {
-                document.title = "SuiPlayer"
+                document.title = 'SuiPlayer'
             })
             if ('mediaSession' in navigator) {
                 setupMediaSessionAPI(ap, data)
             }
-        })();
+        })()
 
         function getNameFromMeta(x) {
-            return `${x.title} (${x.datetime.slice(0, 10)})` +
-                (x.artist === "星街すいせい" ? "" : ` (Orig. ${x.artist})`)
+            return (
+                `${x.title} (${x.datetime.slice(0, 10)})` +
+                (x.artist === '星街すいせい' ? '' : ` (Orig. ${x.artist})`)
+            )
         }
 
         function audioHas(audioObj, word) {
-            return audioObj.name.toLowerCase().includes(word) || audioObj.artist.toLowerCase().includes(word)
+            return (
+                audioObj.name.toLowerCase().includes(word) ||
+                audioObj.artist.toLowerCase().includes(word)
+            )
         }
 
         function audioEqu(au1, au2) {
@@ -132,7 +137,7 @@
         }
 
         function findAudioInfo(url, std) {
-            const audio = std.filter(x => x.url === url)
+            const audio = std.filter((x) => x.url === url)
             if (audio.length === 0) {
                 return null
             }
@@ -148,7 +153,7 @@
         }
 
         function applySearchResults(val, std, ap) {
-            const finalList = std.filter(x => audioHas(x, val))
+            const finalList = std.filter((x) => audioHas(x, val))
             const currentList = ap.list.audios
             for (let i = currentList.length - 1; i >= 0; i--) {
                 if (!audioHas(ap.list.audios[i], val)) {
@@ -184,7 +189,7 @@
         const throttledSearch = throttle(applySearchResults, 400)
 
         function setupSearch(search, std, ap) {
-            search.addEventListener('input', x => {
+            search.addEventListener('input', (x) => {
                 const val = search.value.toLowerCase()
                 throttledSearch(val, std, ap)
             })
@@ -202,39 +207,54 @@
                     artist: audio.performer,
                     album: 'Suisei Music Player',
                     artwork: [
-                        { src: 'https://player.suisei.moe/cover-512.png', sizes: '512x512', type: 'image/png' },
+                        {
+                            src: 'https://player.suisei.moe/cover-512.png',
+                            sizes: '512x512',
+                            type: 'image/png',
+                        },
                         { src: 'https://player.suisei.moe/cover.png' },
-
-                    ]
-                });
+                    ],
+                })
             })
             navigator.mediaSession.setActionHandler('play', function () {
                 ap.play()
-            });
+            })
             navigator.mediaSession.setActionHandler('pause', function () {
                 ap.pause()
-            });
+            })
             navigator.mediaSession.setActionHandler('stop', function () {
                 ap.pause()
                 ap.seek(0)
-            });
-            navigator.mediaSession.setActionHandler('seekbackward', function (details) {
-                const seekTime = isNaN(details.seekOffset) ? Number(details.seekOffset) : 5;
-                ap.seek(
-                    Math.max(ap.audio.currentTime - seekTime, 0)
-                )
-            });
-            navigator.mediaSession.setActionHandler('seekforward', function (details) {
-                const seekTime = isNaN(details.seekOffset) ? Number(details.seekOffset) : 5;
-                ap.seek(
-                    Math.min(ap.audio.currentTime + seekTime, ap.audio.duration)
-                )
-            });
+            })
+            navigator.mediaSession.setActionHandler(
+                'seekbackward',
+                function (details) {
+                    const seekTime = isNaN(details.seekOffset)
+                        ? Number(details.seekOffset)
+                        : 5
+                    ap.seek(Math.max(ap.audio.currentTime - seekTime, 0))
+                }
+            )
+            navigator.mediaSession.setActionHandler(
+                'seekforward',
+                function (details) {
+                    const seekTime = isNaN(details.seekOffset)
+                        ? Number(details.seekOffset)
+                        : 5
+                    ap.seek(
+                        Math.min(ap.audio.currentTime + seekTime, ap.audio.duration)
+                    )
+                }
+            )
             navigator.mediaSession.setActionHandler('seekto', function (details) {
                 ap.seek(details.seekTime)
-            });
-            navigator.mediaSession.setActionHandler('previoustrack', function () { ap.skipBack() });
-            navigator.mediaSession.setActionHandler('nexttrack', function () { ap.skipForward() });
+            })
+            navigator.mediaSession.setActionHandler('previoustrack', function () {
+                ap.skipBack()
+            })
+            navigator.mediaSession.setActionHandler('nexttrack', function () {
+                ap.skipForward()
+            })
         }
     </script>
     <script type="module" src="playlist.js"></script>
@@ -243,7 +263,7 @@
             const div = document.createElement('div')
             div.className = 'notice'
             div.innerHTML =
-            "<b>Your browser does not support <a href='https://caniuse.com/es6-module'>ES Modules</a>. Please upgrade the browser to enjoy the playlist feature on this site.</b>"
+                "<b>Your browser does not support <a href='https://caniuse.com/es6-module'>ES Modules</a>. Please upgrade the browser to enjoy the playlist feature on this site.</b>"
             document.body.insertBefore(div, document.querySelector('#searchArea'))
         }
     </script>
