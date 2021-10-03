@@ -69,7 +69,7 @@
         Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered experience on PC!
         (<a href="#" onclick="hideNotice()">hide</a>)
     </div>
-    <div>
+    <div id="searchArea">
         <input type="text" id="searchItem" class="playArea" placeholder="Search...">
     </div>
     <div id="player" class="playArea">
@@ -235,6 +235,16 @@
             });
             navigator.mediaSession.setActionHandler('previoustrack', function () { ap.skipBack() });
             navigator.mediaSession.setActionHandler('nexttrack', function () { ap.skipForward() });
+        }
+    </script>
+    <script type="module" src="playlist.js"></script>
+    <script nomodule>
+        if (new URL(document.location).searchParams.get('playlist')) {
+            const div = document.createElement('div')
+            div.className = 'notice'
+            div.innerHTML =
+            "<b>Your browser does not support <a href='https://caniuse.com/es6-module'>ES Modules</a>. Please upgrade the browser to enjoy the playlist feature on this site.</b>"
+            document.body.insertBefore(div, document.querySelector('#searchArea'))
         }
     </script>
 </body>
