@@ -86,6 +86,7 @@
             const data = await fetch(
                 'https://suisei-podcast.outv.im/meta.json'
             ).then((x) => x.json())
+            let baseTitle = "SuiPlayer"
             const stdList = data.map((x) => {
                 return {
                     name: getNameFromMeta(x),
@@ -94,24 +95,30 @@
                     cover: 'https://static.suisei.moe/image/98f560ae05c02361.jpeg',
                 }
             })
+            const presetPlaylist = await loadPlaylist(stdList)
+            const currList = presetPlaylist === null ? stdList : presetPlaylist.playlist
+            if (presetPlaylist && presetPlaylist.title) {
+                baseTitle = `${presetPlaylist.title} | ${baseTitle}`
+                document.title = baseTitle
+            }
             let ap = new APlayer({
                 container: document.getElementById('player'),
-                audio: [...stdList],
+                audio: [...currList],
                 listFolded: false,
             })
             const domSearch = document.querySelector('#searchItem')
             const q = new URL(document.location).searchParams.get('q')
             if (q !== null) {
                 domSearch.value = q
-                applySearchResults(q.toLowerCase(), stdList, ap)
+                applySearchResults(q.toLowerCase(), currList, ap)
             }
-            setupSearch(domSearch, stdList, ap)
+            setupSearch(domSearch, currList, ap)
             ap.on('play', () => {
                 document.title =
-                    findAudioDescByUrl(ap.audio.src, data) + ' | SuiPlayer'
+                    findAudioDescByUrl(ap.audio.src, data) + ` | ${baseTitle}`
             })
             ap.on('pause', () => {
-                document.title = 'SuiPlayer'
+                document.title = baseTitle
             })
             if ('mediaSession' in navigator) {
                 setupMediaSessionAPI(ap, data)
@@ -256,15 +263,48 @@
                 ap.skipForward()
             })
         }
-    </script>
-    <script type="module" src="playlist.js"></script>
-    <script nomodule>
-        if (new URL(document.location).searchParams.get('playlist')) {
-            const div = document.createElement('div')
-            div.className = 'notice'
-            div.innerHTML =
-                "<b>Your browser does not support <a href='https://caniuse.com/es6-module'>ES Modules</a>. Please upgrade the browser to enjoy the playlist feature on this site.</b>"
-            document.body.insertBefore(div, document.querySelector('#searchArea'))
+
+        async function loadPlaylist(baseList) {
+            const playlistUrl = new URL(document.location).searchParams.get('playlist')
+            if (playlistUrl === null) {
+                return null
+            }
+            const text = await fetch(playlistUrl)
+                .then((x) => {
+                    if (x.status !== 200) {
+                        console.warn('Cannot fet the playlist')
+                        return null
+                    }
+                    return x
+                })
+                .then((x) => {
+                    if (x === null) return null
+                    return x.text()
+                })
+            if (text === null) return null
+            let title = "Undefined Playlist"
+            const playlistIds = text
+                .split('\n')
+                .map((x) => {
+                    if (x.startsWith("# ")) {
+                        title = x.replace(/^# /, "")
+                        return null
+                    }
+                    const match = x.match(/^[0-9a-f]{16}/)
+                    if (match === null) return null
+                    return match[0]
+
+                })
+                .filter((x) => x !== null)
+            const baseListDict = {}
+            for (const i of baseList) {
+                const id = new URL(i.url).pathname.slice(1).split(".")[0]
+                baseListDict[id] = i
+            }
+            return {
+                title,
+                playlist: playlistIds.map(x => baseListDict[x]).filter(x => x)
+            }
         }
     </script>
 </body>
