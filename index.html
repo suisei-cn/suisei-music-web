@@ -61,6 +61,25 @@
         #player .aplayer-list ol {
             max-height: 68vh !important;
         }
+
+        #player .aplayer-music {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #player .aplayer-music .aplayer-author {
+            margin-left: 5px;
+        }
+
+        #player .aplayer-music #srcLink {
+            font-size: 14px;
+            text-align: right;
+            flex-grow: 1;
+        }
+
+        #player .aplayer-music a {
+            text-decoration: none !important;
+        }
     </style>
 </head>
 
@@ -106,6 +125,9 @@
                 audio: [...currList],
                 listFolded: false,
             })
+            const srcLink = document.createElement("div")
+            srcLink.id = "srcLink"
+            document.querySelector(".aplayer-music").appendChild(srcLink)
             const domSearch = document.querySelector('#searchItem')
             const q = new URL(document.location).searchParams.get('q')
             if (q !== null) {
@@ -119,6 +141,16 @@
             })
             ap.on('pause', () => {
                 document.title = baseTitle
+            })
+            ap.on('loadedmetadata', () => {
+                srcLink.innerHTML = ""
+                const musicSrc = findAudioInfo(ap.audio.src, data)?.source
+                if (!musicSrc) return
+                const a = document.createElement("a")
+                a.innerText = "🌐"
+                a.href = musicSrc
+                a.target = "_blank"
+                srcLink.appendChild(a)
             })
             if ('mediaSession' in navigator) {
                 setupMediaSessionAPI(ap, data)
