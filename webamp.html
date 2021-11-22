@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>15 Latest Suisei Songs</title>
+</head>
+
+<body>
+    <div id="app" style="height: 100vh">
+        <!-- Webamp will attempt to center itself within this div -->
+    </div>
+    <script type="module">
+        import Webamp from 'https://cdn.skypack.dev/webamp';
+
+        const musicMeta = await fetch("https://suisei-podcast.outv.im/meta.json").then(x => x.json())
+
+        const webamp = new Webamp({
+            initialTracks: musicMeta.sort((a, b) => {
+                const dta = new Date(a.datetime)
+                const dtb = new Date(b.datetime)
+                // pick latest ones
+                return dtb - dta
+            }).slice(0, 15).map(({ artist, title, url }) => ({
+                metaData: {
+                    artist,
+                    title
+                },
+                url
+            }))
+        });
+
+        // Returns a promise indicating when it's done loading.
+        webamp.renderWhenReady(document.getElementById('app'));
+    </script>
+</body>
+
+</html>
