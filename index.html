@@ -160,7 +160,7 @@
         function getNameFromMeta(x) {
             return (
                 `${x.title} (${x.datetime.slice(0, 10)})` +
-                (x.artist === '星街すいせい' ? '' : ` (Orig. ${x.artist})`)
+                (x.artist === x.performer ? '' : ` (Orig. ${x.artist})`)
             )
         }
 
