@@ -7,7 +7,7 @@
     <title>SuiPlayer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" />
     <link rel="alternate" type="application/rss+xml" title="Suisei Music Podcast"
-        href="https://suisei.moe/podcast.xml" />
+        href="https://suisei.cc/podcast.xml" />
     <style>
         body {
             display: flex;
@@ -85,7 +85,7 @@
 
 <body>
     <div class="notice">
-        Try <a href="https://suiseki.suisei.moe">Suiseki</a> for a more ordered
+        Try <a href="https://suiseki.suisei.cc">Suiseki</a> for a more ordered
         experience on PC! (<a href="#" onclick="hideNotice()">hide</a>)
     </div>
     <div id="searchArea">
@@ -111,7 +111,7 @@
                     name: getNameFromMeta(x),
                     artist: x.performer,
                     url: x.url,
-                    cover: 'https://static.suisei.moe/image/98f560ae05c02361.jpeg',
+                    cover: 'https://static.suisei.cc/image/98f560ae05c02361.jpeg',
                 }
             })
             const presetPlaylist = await loadPlaylist(stdList)
@@ -250,11 +250,11 @@
                     album: 'Suisei Music Player',
                     artwork: [
                         {
-                            src: 'https://player.suisei.moe/cover-512.png',
+                            src: 'https://player.suisei.cc/cover-512.png',
                             sizes: '512x512',
                             type: 'image/png',
                         },
-                        { src: 'https://player.suisei.moe/cover.png' },
+                        { src: 'https://player.suisei.cc/cover.png' },
                     ],
                 })
             })
