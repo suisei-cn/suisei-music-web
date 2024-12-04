@@ -102,6 +102,7 @@
     <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
     <script>
         ; (async () => {
+            const COVER_URL = "https://cdn.jsdelivr.net/gh/suisei-cn/suisei-music-web@bb184beca63134855d4b80852211d57061ecfacc/cover.png"
             const data = await fetch(
                 'https://suisei-podcast.outv.im/meta.json'
             ).then((x) => x.json())
@@ -111,7 +112,7 @@
                     name: getNameFromMeta(x),
                     artist: x.performer,
                     url: x.url,
-                    cover: 'https://static.suisei.cc/image/98f560ae05c02361.jpeg',
+                    cover: COVER_URL,
                 }
             })
             const presetPlaylist = await loadPlaylist(stdList)
@@ -250,11 +251,10 @@
                     album: 'Suisei Music Player',
                     artwork: [
                         {
-                            src: 'https://player.suisei.cc/cover-512.png',
-                            sizes: '512x512',
+                            src: COVER_URL,
                             type: 'image/png',
                         },
-                        { src: 'https://player.suisei.cc/cover.png' },
+                        { src: COVER_URL },
                     ],
                 })
             })
