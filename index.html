@@ -101,8 +101,9 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
     <script>
+        const COVER_URL = "https://cdn.jsdelivr.net/gh/suisei-cn/suisei-music-web@bb184beca63134855d4b80852211d57061ecfacc/cover.png"
+
         ; (async () => {
-            const COVER_URL = "https://cdn.jsdelivr.net/gh/suisei-cn/suisei-music-web@bb184beca63134855d4b80852211d57061ecfacc/cover.png"
             const data = await fetch(
                 'https://suisei-podcast.outv.im/meta.json'
             ).then((x) => x.json())
